@@ -2,6 +2,40 @@
 #include <string>
 #include <vector>
 
+
+class Error {
+public:
+	void virtual perr() = 0;
+};
+
+class SearchError : public Error {
+public:
+	void perr() override {
+		std::cout << "Something wrong with search!";
+	}
+};
+
+class MergeError : public Error {
+public:
+	void perr() override {
+		std::cout << "Something wrong with merge_sort!";
+	}
+};
+
+class KeyValueError : public Error {
+public:
+	void perr() override {
+		std::cout << "Something wrong with KeyValue class!";
+	}
+};
+
+class BinSearchError : public Error {
+public:
+	void perr() override {
+		std::cout << "No such key was found!";
+	}
+};
+
 template <typename iter_t>
 void merge(iter_t p, iter_t q, iter_t r)
 {
@@ -123,7 +157,7 @@ private:
 
 	template<typename KeyType>
 	size_t bin_search(KeyType key) {
-//		BinSearchError err;
+		BinSearchError err;
 		size_t begin = keys.size() / 2;
 		while (0 <= begin <= keys.size() - 1)
 		{
@@ -148,12 +182,12 @@ private:
 		{
 			return keys.size() - 1;
 		}
-//		throw(err);
+		throw(err);
 	}
 
 	template<>
 	size_t bin_search<double>(double key) {
-//		BinSearchError err;
+		BinSearchError err;
 		size_t begin = keys.size() / 2;
 		while (0 <= begin <= keys.size() - 1)
 		{
@@ -178,46 +212,13 @@ private:
 		{
 			return keys.size() - 1;
 		}
-//		throw(err);
+		throw(err);
 	}
 	
 
 	std::vector<ValueT> values;
 	std::vector<KeyT> keys;
 	double epsilon = 0.0001;
-};
-
-class Error {
-public:
-	void virtual perr() = 0;
-};
-
-class SearchError : public Error {
-public:
-	void perr() override {
-		std::cout << "Something wrong with search!";
-	}
-};
-
-class MergeError : public Error {
-public:
-	void perr() override {
-		std::cout << "Something wrong with merge_sort!";
-	}
-};
-
-class KeyValueError : public Error {
-public:
-	void perr() override {
-		std::cout << "Something wrong with KeyValue class!";
-	}
-};
-
-class BinSearchError : public Error {
-public:
-	void perr() override {
-		std::cout << "No such key was found!";
-	}
 };
 
 void search_test() {
@@ -247,12 +248,25 @@ void merge_test() {
 	MergeError err;
 
 	std::vector<double> d = { 1.567, 1312.957891, 123.87 };
+	std::vector<double> d_new = { 1.567, 123.87, 1312.957891 };
 	merge_sort(&d[0], &d[0 + d.size() - 1]);
-	if (d[0] != 1.567 or d[1] != 123.87 or d[2] != 1312.957891) flag = false;
+	if (d.data() == d_new.data()) flag = false;
 
 	char b[] = "hello";
 	merge_sort(&b[0], &b[0 + array_size(b) - 1]);
-	if (b[1] != 'e' or b[2] != 'h' or b[3] != 'l' or b[5] != 'o') flag = false;
+	if (b[0] != '\0' or b[1] != 'e' or b[2] != 'h' or b[3] != 'l' or b[5] != 'o') flag = false;
+
+	char e[] = "abcd";
+	merge_sort(&e[0], &e[0 + array_size(e) - 1]);
+	if (e[0] != '\0' or e[1] != 'a' or e[2] != 'b' or e[3] != 'c' or e[4] != 'd') flag = false;
+
+	char f[] = "rcba";
+	merge_sort(&f[0], &f[0 + array_size(f) - 1]);
+	if (f[0] != '\0' or f[1] != 'a' or f[2] != 'b' or f[3] != 'c' or f[4] != 'r') flag = false;
+
+	char g[] = "qwer";
+	merge_sort(&g[0], &g[0 + array_size(g) - 1]);
+	if (g[0] != '\0' or g[1] != 'e' or g[2] != 'q' or g[3] != 'r' or g[4] != 'w') flag = false;
 
 	if (!flag)
 	{
