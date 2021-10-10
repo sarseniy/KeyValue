@@ -62,7 +62,7 @@ void merge(iter_t p, iter_t q, iter_t r)
 
 	for (k = p; i < n1 && j < n2; k++)
 	{
-		if (L[i].get_key() < R[j].get_key())
+		if (L[i] < R[j])
 		{
 			*k = L[i++];
 		}
@@ -126,11 +126,19 @@ size_t array_size(const T(&)[N]) {
 	return N;
 }
 
+/*Node<std::string>::Node() {
+	Node::val = "";
+	Node::key = NULL;
+}*/
+
 template <typename ValueT, typename KeyT=int>
 class Node
 {
 public:
-	//Node() {}
+	Node() { 
+		val = NULL;
+		key = NULL;
+	}
 	Node(ValueT val, KeyT key) : val(val), key(key)
 	{}
 
@@ -140,6 +148,18 @@ public:
 
 	ValueT get_value() {
 		return val;
+	}
+
+	bool operator<(Node<ValueT, KeyT> const& other) {
+		return this->key < other.key;
+	}
+
+	bool operator>(Node<ValueT, KeyT> const& other) {
+		return this->key > other.key;
+	}
+
+	bool operator==(Node<ValueT, KeyT> const& other) {
+		return this->key == other.key;
 	}
 
 private:
@@ -309,7 +329,7 @@ void KeyValue_test() {
 
 	if (obj.get(7) != 89 or obj.get(5) != 12 or obj.get(1) != 97) flag = false;
 
-	/*KeyValue<bool> obj1;
+	KeyValue<bool> obj1;
 
 	obj1.append(7, false);
 	obj1.append(1, true);
@@ -317,19 +337,19 @@ void KeyValue_test() {
 
 	if (obj1.get(7) != false or obj1.get(5) != false or obj1.get(1) != true) flag = false;
 
-	KeyValue<std::string> obj2;
+/*	KeyValue<std::string> obj2;
 
 	obj2.append(7, "Hello");
 	obj2.append(1, "Where");
 	obj2.append(5, "Who?");
 
 	if (obj2.get(7) != "Hello" or obj2.get(5) != "Who?" or obj2.get(1) != "Where") flag = false;
-	*/
+*/	
 
-	/*if (!flag)
+	if (!flag)
 	{
 		throw(err);
-	}*/
+	}
 	
 }
 
