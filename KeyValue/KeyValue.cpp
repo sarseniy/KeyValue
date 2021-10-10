@@ -62,7 +62,7 @@ void merge(iter_t p, iter_t q, iter_t r)
 
 	for (k = p; i < n1 && j < n2; k++)
 	{
-		if (L[i] < R[j])
+		if (L[i].get_key() < R[j].get_key())
 		{
 			*k = L[i++];
 		}
@@ -127,6 +127,27 @@ size_t array_size(const T(&)[N]) {
 }
 
 template <typename ValueT, typename KeyT=int>
+class Node
+{
+public:
+	//Node() {}
+	Node(ValueT val, KeyT key) : val(val), key(key)
+	{}
+
+	KeyT get_key() {
+		return key;
+	}
+
+	ValueT get_value() {
+		return val;
+	}
+
+private:
+	ValueT val;
+	KeyT key;
+};
+
+template <typename ValueT, typename KeyT=int>
 class KeyValue
 {
 public:
@@ -134,53 +155,55 @@ public:
 	{}
 
 	void append(KeyT key, ValueT value) {
-		values.push_back(value);
-		keys.push_back(key);
+		Node<ValueT, KeyT> a(value, key);
+		data.push_back(a);
+//		values.push_back(value);
+//		keys.push_back(key);
 	}
 
 	ValueT get(KeyT key) {
 		this->sort();
-		return values[bin_search(key)];
+		return data[bin_search(key)].get_value();
 	}
 
 private:
 	void sort() {
-		std::vector<KeyT> old_keys = keys;
-		std::vector<ValueT> new_values(values.size());
-		merge_sort(&keys[0], &keys[0 + keys.size() - 1]);
+//		std::vector<KeyT> old_keys = keys;
+//		std::vector<ValueT> new_values(values.size());
+		merge_sort(&data[0], &data[0 + data.size() - 1]);
 
-		for (int i = 0; i < new_values.size(); ++i) {
-			new_values[i] = values[search(&old_keys[0], &old_keys[0 + old_keys.size()], keys[i])];
-		}
-		values = new_values;
+//		for (int i = 0; i < new_values.size(); ++i) {
+//			new_values[i] = values[search(&old_keys[0], &old_keys[0 + old_keys.size()], keys[i])];
+//		}
+//		values = new_values;
 	}
 
 	template<typename KeyType>
 	size_t bin_search(KeyType key) {
 		BinSearchError err;
-		size_t begin = keys.size() / 2;
-		while (0 <= begin <= keys.size() - 1)
+		size_t begin = data.size() / 2;
+		while (0 <= begin <= data.size() - 1)
 		{
-			if (keys[begin] > key)
+			if (data[begin].get_key() > key)
 			{
 				begin = begin / 2;
 			}
-			else if (keys[begin] < key)
+			else if (data[begin].get_key() < key)
 			{
-				begin = (begin + keys.size()) / 2;
+				begin = (begin + data.size()) / 2;
 			}
-			else if (keys[begin] == key)
+			else if (data[begin].get_key() == key)
 			{
 				return begin;
 			}
 		}
-		if (keys[0] == key)
+		if (data[0].get_key() == key)
 		{
 			return 0;
 		}
-		if (keys[keys.size() - 1] == key)
+		if (data[data.size() - 1].get_key() == key)
 		{
-			return keys.size() - 1;
+			return data.size() - 1;
 		}
 		throw(err);
 	}
@@ -188,36 +211,36 @@ private:
 	template<>
 	size_t bin_search<double>(double key) {
 		BinSearchError err;
-		size_t begin = keys.size() / 2;
-		while (0 <= begin <= keys.size() - 1)
+		size_t begin = data.size() / 2;
+		while (0 <= begin <= data.size() - 1)
 		{
-			if (abs(keys[begin] - key) <= epsilon)
+			if (abs(data[begin].get_key() - key) <= epsilon)
 			{
 				return begin;
 			}
-			else if (keys[begin] < key)
+			else if (data[begin].get_key() < key)
 			{
-				begin = (begin + keys.size()) / 2;
+				begin = (begin + data.size()) / 2;
 			}
-			else if (keys[begin] > key)
+			else if (data[begin].get_key() > key)
 			{
 				begin = begin / 2;
 			}
 		}
-		if (abs(keys[0] - key) <= epsilon)
+		if (abs(data[0].get_key() - key) <= epsilon)
 		{
 			return 0;
 		}
-		if (abs(keys[keys.size() - 1] - key) <= epsilon)
+		if (abs(data[data.size() - 1].get_key() - key) <= epsilon)
 		{
-			return keys.size() - 1;
+			return data.size() - 1;
 		}
 		throw(err);
 	}
 	
 
-	std::vector<ValueT> values;
-	std::vector<KeyT> keys;
+	std::vector<Node<ValueT, KeyT>> data;
+//	std::vector<KeyT> keys;
 	double epsilon = 0.0001;
 };
 
@@ -286,7 +309,7 @@ void KeyValue_test() {
 
 	if (obj.get(7) != 89 or obj.get(5) != 12 or obj.get(1) != 97) flag = false;
 
-	KeyValue<bool> obj1;
+	/*KeyValue<bool> obj1;
 
 	obj1.append(7, false);
 	obj1.append(1, true);
@@ -301,13 +324,13 @@ void KeyValue_test() {
 	obj2.append(5, "Who?");
 
 	if (obj2.get(7) != "Hello" or obj2.get(5) != "Who?" or obj2.get(1) != "Where") flag = false;
+	*/
 
-
-	if (!flag)
+	/*if (!flag)
 	{
 		throw(err);
-	}
-
+	}*/
+	
 }
 
 int main()
@@ -315,6 +338,7 @@ int main()
 	try {
 		search_test();
 		merge_test();
+		KeyValue_test();
 	}
 	catch (SearchError err) {
 		err.perr();
