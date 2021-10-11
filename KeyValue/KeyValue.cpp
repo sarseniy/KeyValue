@@ -208,10 +208,12 @@ public:
 	void append(KeyT key, ValueT value) {
 		Node<ValueT, KeyT> a(value, key);
 		data.push_back(a);
+		is_sorted = false;
 	}
 
 	ValueT get(KeyT key) {
-		this->sort();
+		if (!is_sorted)	this->sort();
+		is_sorted = true;
 		return data[bin_search(key)].get_value();
 	}
 
@@ -280,7 +282,7 @@ private:
 		throw(err);
 	}
 	
-
+	bool is_sorted = false;
 	std::vector<Node<ValueT, KeyT>> data;
 	double epsilon = 0.0001;
 };
