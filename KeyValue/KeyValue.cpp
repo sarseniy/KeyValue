@@ -126,11 +126,6 @@ size_t array_size(const T(&)[N]) {
 	return N;
 }
 
-/*Node<std::string>::Node() {
-	Node::val = "";
-	Node::key = NULL;
-}*/
-
 template <typename ValueT, typename KeyT=int>
 class Node
 {
@@ -167,6 +162,42 @@ private:
 	KeyT key;
 };
 
+template <typename KeyT>
+class Node<std::string, KeyT>
+{
+public:
+	Node() {
+		val = "";
+		key = NULL;
+	}
+	Node(std::string val, KeyT key) : val(val), key(key)
+	{}
+
+	KeyT get_key() {
+		return key;
+	}
+
+	std::string get_value() {
+		return val;
+	}
+
+	bool operator<(Node<std::string, KeyT> const& other) {
+		return this->key < other.key;
+	}
+
+	bool operator>(Node<std::string, KeyT> const& other) {
+		return this->key > other.key;
+	}
+
+	bool operator==(Node<std::string, KeyT> const& other) {
+		return this->key == other.key;
+	}
+
+private:
+	std::string val;
+	KeyT key;
+};
+
 template <typename ValueT, typename KeyT=int>
 class KeyValue
 {
@@ -177,8 +208,6 @@ public:
 	void append(KeyT key, ValueT value) {
 		Node<ValueT, KeyT> a(value, key);
 		data.push_back(a);
-//		values.push_back(value);
-//		keys.push_back(key);
 	}
 
 	ValueT get(KeyT key) {
@@ -188,14 +217,7 @@ public:
 
 private:
 	void sort() {
-//		std::vector<KeyT> old_keys = keys;
-//		std::vector<ValueT> new_values(values.size());
 		merge_sort(&data[0], &data[0 + data.size() - 1]);
-
-//		for (int i = 0; i < new_values.size(); ++i) {
-//			new_values[i] = values[search(&old_keys[0], &old_keys[0 + old_keys.size()], keys[i])];
-//		}
-//		values = new_values;
 	}
 
 	template<typename KeyType>
@@ -260,7 +282,6 @@ private:
 	
 
 	std::vector<Node<ValueT, KeyT>> data;
-//	std::vector<KeyT> keys;
 	double epsilon = 0.0001;
 };
 
@@ -337,14 +358,14 @@ void KeyValue_test() {
 
 	if (obj1.get(7) != false or obj1.get(5) != false or obj1.get(1) != true) flag = false;
 
-/*	KeyValue<std::string> obj2;
+	KeyValue<std::string> obj2;
 
 	obj2.append(7, "Hello");
 	obj2.append(1, "Where");
 	obj2.append(5, "Who?");
 
 	if (obj2.get(7) != "Hello" or obj2.get(5) != "Who?" or obj2.get(1) != "Where") flag = false;
-*/	
+
 
 	if (!flag)
 	{
